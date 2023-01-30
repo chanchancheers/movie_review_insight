@@ -137,12 +137,15 @@ class crawling_thread(threading.Thread):
                     except :
                         pass
                 
-                next = self.driver.find_element(By.XPATH, f'//*[@id="pagerTagAnchor{next_number}"]/em')
-                if next.text == '다음':
-                    next.click()
-                    next_number += 1
-                    time.sleep(0.1)
-                else :
+                try:
+                    next = self.driver.find_element(By.XPATH, f'//*[@id="pagerTagAnchor{next_number}"]/em')
+                    if next.text == '다음':
+                        next.click()
+                        next_number += 1
+                        time.sleep(0.1)
+                    else :
+                        next_onoff = False
+                except:
                     next_onoff = False
         
         
@@ -212,7 +215,7 @@ class Crawler():
 
         for i, target_url in enumerate(movie_urls, 1):
             thread = crawling_thread(i, target_url, self.db)
-            thread.deal_page_num(self.review_page_num)
+            thread.deal_page_num = self.review_page_num
             thread.start()
             threads.append(thread)
             if i %  self.__maximum_threads == 0:
