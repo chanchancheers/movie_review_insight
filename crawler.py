@@ -4,20 +4,6 @@ from selenium.webdriver.common.by import By
 import time
 
 
-class Reveiw(threading.Thread):
-    def __init__(self, crawler):
-        super().__init__()
-        self.crawler = crawler
-
-
-class Info(threading.Thread):
-    def __init__(self, crawler):
-        super().__init__()
-        self.crawler = crawler
-
-
-
-
 class crawling_thread(threading.Thread):
     def __init__(self, name, url, db_handler):
         super().__init__()
@@ -26,6 +12,19 @@ class crawling_thread(threading.Thread):
         self.url = url
         self.driver = webdriver.Chrome('chromedriver')
         self.db_handler = db_handler
+
+        self.__review_page_num = 100
+
+    @property
+    def deal_page_num(self):
+        return self.__review_page_num
+    @deal_page_num.setter
+    def deal_page_num(self, number):
+        self.__review_page_num = number
+    @deal_page_num.deleter
+    def deal_page_num(self):
+        del self.__review_page_num
+
 
     def run(self):
 
@@ -111,12 +110,12 @@ class crawling_thread(threading.Thread):
                 return None
 
             #리뷰 n * 10 개로 제한(페이지 n개)
-            limit_number = 100
+            # self.__review_page_num = 100
 
             next_onoff = True
             next_number = 2     # 다음 페이지 = 2부터 시작
             print(f"\n\nTHREAD {self.name} reviews collected.\n")
-            while next_onoff and next_number <= limit_number:
+            while next_onoff and next_number <= self.__review_page_num:
                 try:
                     score_result_Se = self.driver.find_element(By.XPATH, '/html/body/div/div/div[5]')
             
@@ -155,9 +154,21 @@ class crawling_thread(threading.Thread):
 
 
 class Crawler():
-    def __init__(self, db):
-        self.db = db
-        pass
+    def __init__(self, db, movie_name, review_page_num):
+        self.db = db        
+        self.__maximum_threads = 5
+        self.movie_name = movie_name
+        self.review_page_num = review_page_num
+
+    @property
+    def deal_maximum_threads(self):
+        return self.__maximum_threads
+    @deal_maximum_threads.setter
+    def deal_maximum_threads(self, number):
+        self.__maximum_threads = number
+    @deal_maximum_threads.deleter
+    def deal_maximum_threads(self):
+        del self.__maximum_threads
 
 
     def crawling(self):
@@ -166,7 +177,7 @@ class Crawler():
         driver = webdriver.Chrome('chromedriver')
         
         # 일단 아바타 하나로
-        movies = '아바타'
+        movies = self.movie_name
         main_page = rf'https://movie.naver.com/movie/search/result.naver?section=movie&query={movies}'
         driver.get(main_page)
 
@@ -197,14 +208,14 @@ class Crawler():
         
         #다음 페이지로 입장
         threads = []
-        #동시작업 최대 스레드 제한
-        maximum_threads = 5
+        
 
         for i, target_url in enumerate(movie_urls, 1):
             thread = crawling_thread(i, target_url, self.db)
+            thread.deal_page_num(self.review_page_num)
             thread.start()
             threads.append(thread)
-            if i %  maximum_threads == 0:
+            if i %  self.__maximum_threads == 0:
                 for item in threads:
                     item.join()
                 threads.clear()
