@@ -1,21 +1,25 @@
+from db_handler import DB
+from config import config
 import psycopg2 as pc2
 
+
 class DB():
-    def __init__(self, dbname):
-        self.db = pc2.connect(
-                                host='localhost',
-                                dbname = dbname,
-                                user='sineu',
-                                password='dmscks1!',
-                                port=5432
-                                )
-        print("\n=== NOTE : DB is now CONNECTED ===\n")
-        # self.cursor = self.db.cursor()
+    def __init__(self):
+        self.conn = None
+        try:
+            params = config()
+            self.conn = pc2.connect(**params)
+            self.cur = self.conn.cursor()
+
+            self.cur.execute('SELECT version()')
+            db_version = self.cur.fetchone()
+            print(f"PostgreSQL Database version : {db_version}")
+        except (Exception, pc2.DatabaseError) as error:
+            print(error)
 
     def execute(self, query):
-        self.db.cursor().execute(query)
-
-
+        self.cur.execute(query)
+    
     def insert_info(self, movie_id, title, title_eng, director, year, rating):
         query = f'''
                 INSERT INTO Movies (Movie_id, Title, Title_eng, Director, Year, Rating)
@@ -33,8 +37,8 @@ class DB():
         self.execute(query)
 
     def commit(self):
-        self.db.commit()
-
+        self.conn.commit()
+    
     def execute_only_once(self):
         query = f'''
                 DROP TABLE IF EXISTS Reviews;
@@ -58,10 +62,10 @@ class DB():
                 '''
         self.execute(query)
         self.commit()
-            
-    
 
 
-    
+db = DB()
+
+
 
 
