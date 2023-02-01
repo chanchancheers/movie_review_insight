@@ -53,6 +53,7 @@ def make_wc(txtfile,
     gen = wordcloud.generate_from_frequencies(counter)
     plt.figure(figsize=(20,20))
     plt.imshow(gen)
-    wordcloud.to_file('./wordcloud_pics/picture.png')
+    # wordcloud.to_file('./wordcloud_pics/picture.png')
+    return gen
 
 
