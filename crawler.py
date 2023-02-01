@@ -129,8 +129,18 @@ class crawling_thread(threading.Thread):
 
                 for i, a_review in enumerate(each_review_Se):
                     try:
+        
                         review_rating = a_review.find_element(By.TAG_NAME, 'em').text
-                        content = a_review.find_element(By.ID,f'_filtered_ment_{i}').text
+                        #onclick이라는 항목이 있으면 눌러야됨...
+                        content_Se = a_review.find_element(By.ID,f'_filtered_ment_{i}')
+
+                        try:
+                            content = content_Se.find_element(By.TAG_NAME, 'a').get_attribute('data-src')
+                        except:
+                            content = content_Se.text
+
+                        
+                        
                         self.db_handler.insert_review(movie_id, int(review_rating), content)
                         self.db_handler.commit()
 

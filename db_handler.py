@@ -1,4 +1,3 @@
-from db_handler import DB
 from config import config
 import psycopg2 as pc2
 
@@ -18,6 +17,7 @@ class DB():
             print(error)
 
     def execute(self, query):
+
         self.cur.execute(query)
     
     def insert_info(self, movie_id, title, title_eng, director, year, rating):
@@ -38,7 +38,18 @@ class DB():
 
     def commit(self):
         self.conn.commit()
+
+
+    #왜 fetchone은 내부함수로 돌리면 안되고 꼭 db.cur.fetchone()으로만 가능할까?
+    def fetchone(self):
+        return self.cur.fetchone()
     
+    def fetchmany(self, count):
+        return self.cur.fetchmany(count)
+
+    def fetchall(self):
+        return self.cur.fetchall()
+
     def execute_only_once(self):
         query = f'''
                 DROP TABLE IF EXISTS Reviews;
@@ -62,10 +73,4 @@ class DB():
                 '''
         self.execute(query)
         self.commit()
-
-
-db = DB()
-
-
-
 

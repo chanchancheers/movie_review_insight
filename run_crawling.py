@@ -1,7 +1,7 @@
 from db_handler import DB
 from crawler import Crawler
 
-db = DB('movie_info')
+db = DB()
 db.execute_only_once()
 
 print("DB reinitialized")
