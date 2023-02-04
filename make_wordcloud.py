@@ -70,7 +70,7 @@ db = DB()
 
 
 
-searching_word = '13'
+searching_word = '다큐'
 query = f'''
         SELECT * FROM Reviews
         WHERE (POSITION('{searching_word}' in content) > 0);
@@ -91,10 +91,11 @@ wordcloud = WordCloud(
 
 
 excludings = [
-    '아바타','제임스','카메론','그동안', '감독', '최근', '이게', '이걸', '과정', '그때', '그것', '요즘', '리마'
+    '아바타','그동안', '감독', '최근', '이게', '이걸', '과정', '그때', '그것', '요즘', '리마'
     ,'영화','작품','텐데','때문','하나','이건','정도','하나', '당시', '레이', '동안', '개봉', '러닝', '타임'
 
 ]
+excludings.append(searching_word)
 make_wc(all_string, excludings, wordcloud)
 
 img = Image.open('./wordcloud_pics/picture.png')
