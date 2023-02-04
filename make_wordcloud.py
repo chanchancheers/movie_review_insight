@@ -46,13 +46,12 @@ def make_wc(txtfile,
             new_nouns.append(item)
 
     for item in excludings:
-        if item in new_nouns:
+        if item in new_nouns :
             while item in new_nouns:
                 new_nouns.remove(item)
 
     counter = Counter(new_nouns)         
 
-    
     gen = wordcloud.generate_from_frequencies(counter)
     plt.figure(figsize=(20,20))
     plt.imshow(gen)
