@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 import time
 
 
-class crawling_thread(threading.Thread):
+class Crawling_thread(threading.Thread):
     def __init__(self, name, url, db_handler):
         super().__init__()
         self.name = f"Thread {name}"
@@ -57,10 +57,20 @@ class crawling_thread(threading.Thread):
             score_Se = movie_info_Se.find_element(By.CLASS_NAME, 'main_score')
             # star_score_Se = main_score_Se.find_elements(By.TAG_NAME, 'em')
             score_found = True
-            
+
+        
         except Exception as e:
             pass
         
+        #줄거리 가져오기
+        explanation = ""
+        if score_found :
+            try:
+                explanation_Se = self.driver.find_element(By.XPATH, '//*[@id="content"]/div[1]/div[4]/div[1]/div/div[1]/p')
+                explanation = explanation_Se.text
+            except:
+                pass
+
         if score_found :
             main_score_Se = movie_info_Se.find_element(By.XPATH, '//*[@id="content"]/div[1]/div[2]/div[1]/div[1]')
             star_score_Se = main_score_Se.find_elements(By.TAG_NAME, 'em')
@@ -95,8 +105,11 @@ class crawling_thread(threading.Thread):
         if not score_found:
             rating = 0
         
-        self.db_handler.insert_info(movie_id, title, title_eng, director, year, rating)
+        self.db_handler.insert_info(movie_id, title, title_eng, director, year, rating, explanation)
         self.db_handler.commit()
+
+
+
 
         #리뷰 크롤링
         
@@ -224,7 +237,7 @@ class Crawler():
         
 
         for i, target_url in enumerate(movie_urls, 1):
-            thread = crawling_thread(i, target_url, self.db)
+            thread = Crawling_thread(i, target_url, self.db)
             thread.deal_page_num = self.review_page_num
             thread.start()
             threads.append(thread)

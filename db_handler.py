@@ -20,10 +20,10 @@ class DB():
 
         self.cur.execute(query)
     
-    def insert_info(self, movie_id, title, title_eng, director, year, rating):
+    def insert_info(self, movie_id, title, title_eng, director, year, rating, explanation):
         query = f'''
-                INSERT INTO Movies (Movie_id, Title, Title_eng, Director, Year, Rating)
-                    VALUES ({movie_id}, $$'{title}'$$, $$'{title_eng}'$$, $$'{director}'$$, '{year}', {rating});
+                INSERT INTO Movies (movie_id, Title, Title_eng, Director, Year, Rating, content)
+                    VALUES ({movie_id}, $$'{title}'$$, $$'{title_eng}'$$, $$'{director}'$$, '{year}', {rating}, $$'{explanation}'$$);
     
                 ''' 
         self.execute(query)
@@ -55,15 +55,17 @@ class DB():
                 DROP TABLE IF EXISTS Reviews;
                 DROP TABLE IF EXISTS Movies;
 
-                CREATE TABLE IF NOT EXISTS Movies (
-                        Movie_id SERIAL primary key,
-                        Title VARCHAR(100) not null,
-                        Title_eng VARCHAR(100),
-                        Director VARCHAR(30) not null,
-                        Year VARCHAR(4) not null,
-                        Rating float,
-                        UNIQUE (Title, Director, Year)
-                );
+                CREATE TABLE IF NOT EXISTS movies (
+                    movie_id SERIAL primary key, 
+                    title varchar(100) not null, 
+                    title_eng varchar(100), 
+                    director varchar(30) not null, 
+                    content text,
+                    year varchar(4) not null, 
+                    Rating float, 
+                    published boolean, 
+                    UNIQUE (title, director, year)
+                    );
                 CREATE TABLE IF NOT EXISTS Reviews (
                         Movie_id int REFERENCES Movies(Movie_id),
                         Content VARCHAR(1000),
